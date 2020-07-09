@@ -92,30 +92,63 @@ Value    Setting
 #  indicates a setting that is not displayed in the user interface in Internet Explorer
 ^  indicates a setting that only has two options, enabled or disabled
 
-(table found at https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users)
+Values:
+- 0: Enable
+- 1: Prompt
+- 3: Disable
+
+(ref: https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users)
 
 Internet Zone ActiveX Settings
 - [x] 2702: Allow ActiveX Filtering = Enable
 - [x] 1208: Allow previously unused ActiveX controls to run without prompt = Disable
 - [x] 1209: Allow Scriptlets = Disable
 - [x] 2201: Automatic prompting for ActiveX Controls = Disable
-- [ ] Binary and script behaviors = Enable
-- [ ] Display video and animation on a web page that does not use external media player = Disable
-- [ ] Download signed ActiveX controls = Prompt
-- [ ] Download unsigned ActiveX controls = Disable
-- [ ] Initialize and script ActiveX controls not marked as safe for scripting = Disable
-- [ ] Only allow approved domains to use ActiveX without prompt = Enable
-- [ ] Run ActiveX controls and plug-ins = Enable
-- [ ] Run antimalware software on ActiveX controls = Enable
-- [ ] Script ActiveX controls marked safe for scripting* = Enable
+- [x] 2000: Binary and script behaviors = Enable
+- [ ] ????: Display video and animation on a web page that does not use external media player = Disable
+- [x] 1001: Download signed ActiveX controls = Prompt
+- [x] 1004: Download unsigned ActiveX controls = Disable
+- [x] 1201: Initialize and script ActiveX controls not marked as safe for scripting = Disable
+- [ ] ????: Only allow approved domains to use ActiveX without prompt = Enable
+- [ ] ????: Run ActiveX controls and plug-ins = Enable
+- [x] 270C: Run antimalware software on ActiveX controls = Enable
+- [x] 1405: Script ActiveX controls marked safe for scripting* = Enable
+
+ Trusted Sites Zone ActiveX Settings
+- [x] 2702: Allow ActiveX Filtering = Enable
+- [x] 1208 Allow previously unused ActiveX controls to run without prompt = Enable
+- [x] 1209: Allow Scriptlets = Disable
+- [x] 2201: Automatic prompting for ActiveX Controls = Enable
+- [x] 2000: Binary and script behaviors = Enable
+- [ ] ????: Display video and animation on a web page that does not use external media player = Disable
+- [x] 1001: Download signed ActiveX controls = Prompt
+- [x] 1004: Download unsigned ActiveX controls = Prompt
+- [x] 1201: Initialize and script ActiveX controls not marked as safe for scripting = Disable
+- [ ] ????: Only allow approved domains to use ActiveX without prompt = Disable
+- [ ] ????: Run ActiveX controls and plug-ins = Enable
+- [x] 270C Run antimalware software on ActiveX controls = Disable
+- [x] 1405: Script ActiveX controls marked safe for scripting* = Enable
+- [ ] ????:  *Ensure the use Pop-up blocker = Disable in the Trusted Sites Zone*
+
 #>
 
-$hklm_inet = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3'
-$hkcu_inet = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3'
+$hklm = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones'
+$hkcu = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones'
 
+# Internet Zone keys
+$hklm_inet = "$hklm\3"
+$hkcu_inet = "$hkcu\3"
+
+# Trusted Sites Zone keys
+$hklm_trst = "$hklm\2"
+$hkcu_trst = "$hkcu\2"
 
 Start-Transaction
 Use-Transaction {
+
+  <#
+  Internet Zone ActiveX settings
+  #>
   # Internet Zone: Allow ActiveX Filtering = Enable
   Set-ItemProperty -Path $hklm_inet -Name 2702 -Value 0
   Set-ItemProperty -Path $hkcu_inet -Name 2702 -Value 0
@@ -128,10 +161,77 @@ Use-Transaction {
   Set-ItemProperty -Path $hklm_inet -Name 1209 -Value 3
   Set-ItemProperty -Path $hkcu_inet -Name 1209 -Value 3
   
-  # Automatic prompting for ActiveX Controls = Disable
+  # Internet Zone: Automatic prompting for ActiveX Controls = Disable
   Set-ItemProperty -Path $hklm_inet -Name 2201 -Value 3
   Set-ItemProperty -Path $hkcu_inet -Name 2201 -Value 3
+
+  # Internet Zone: Binary and script behaviors = Enable
+  Set-ItemProperty -Path $hklm_inet -Name 2000 -Value 0
+  Set-ItemProperty -Path $hkcu_inet -Name 2000 -Value 0
+
+  # Internet Zone: Download signed ActiveX controls = Prompt
+  Set-ItemProperty -Path $hklm_inet -Name 1001 -Value 1
+  Set-ItemProperty -Path $hkcu_inet -Name 1001 -Value 1
+
+  # Internet Zone: Download unsigned ActiveX controls = Disable
+  Set-ItemProperty -Path $hklm_inet -Name 1004 -Value 3
+  Set-ItemProperty -Path $hkcu_inet -Name 1004 -Value 3
+
+  # Internet Zone: Initialize and script ActiveX controls not marked as safe for scripting = Disable
+  Set-ItemProperty -Path $hklm_inet -Name 1201 -Value 3
+  Set-ItemProperty -Path $hkcu_inet -Name 1201 -Value 3
+
+  # Internet Zone: Run antimalware software on ActiveX controls = Enable
+  Set-ItemProperty -Path $hklm_inet -Name 0x270C -Value 0
+  Set-ItemProperty -Path $hkcu_inet -Name 0x270C -Value 0
+
+  # Internet Zone: Script ActiveX controls marked safe for scripting* = Enable
+  Set-ItemProperty -Path $hklm_inet -Name 1405 -Value 0
+  Set-ItemProperty -Path $hkcu_inet -Name 1405 -Value 0
+
+  <#
+  Trusted Sites Zone ActiveX settings
+  #>
+  # Trusted Sites Zone: Allow ActiveX Filtering = Enable
+  Set-ItemProperty -Path $hklm_trst -Name 2702 -Value 0
+  Set-ItemProperty -Path $hkcu_trst -Name 2702 -Value 0
+
+  # Trusted Sites Zone: Allow previously unused ActiveX controls to run without prompt = Enable
+  Set-ItemProperty -Path $hkcu_trst -Name 1208 -Value 0
+  Set-ItemProperty -Path $hklm_trst -Name 1208 -Value 0
+
+  # Trusted Sites Zone: Allow Scriptlets = Disable
+  Set-ItemProperty -Path $hklm_trst -Name 1209 -Value 3
+  Set-ItemProperty -Path $hkcu_trst -Name 1209 -Value 3
   
+  # Trusted Sites Zone: Automatic prompting for ActiveX Controls = Enable
+  Set-ItemProperty -Path $hklm_trst -Name 2201 -Value 0
+  Set-ItemProperty -Path $hkcu_trst -Name 2201 -Value 0
+
+  # Trusted Sites Zone: Binary and script behaviors = Enable
+  Set-ItemProperty -Path $hklm_trst -Name 2000 -Value 0
+  Set-ItemProperty -Path $hkcu_trst -Name 2000 -Value 0
+
+  # Trusted Sites Zone: Download signed ActiveX controls = Prompt
+  Set-ItemProperty -Path $hklm_trst -Name 1001 -Value 1
+  Set-ItemProperty -Path $hkcu_trst -Name 1001 -Value 1
+
+  # Trusted Sites Zone: Download unsigned ActiveX controls = Prompt
+  Set-ItemProperty -Path $hklm_trst -Name 1004 -Value 1
+  Set-ItemProperty -Path $hkcu_trst -Name 1004 -Value 1
+
+  # Trusted Sites Zone: Initialize and script ActiveX controls not marked as safe for scripting = Disable
+  Set-ItemProperty -Path $hklm_trst -Name 1201 -Value 3
+  Set-ItemProperty -Path $hkcu_trst -Name 1201 -Value 3
+
+  # Trusted Sites Zone: Run antimalware software on ActiveX controls = Disable
+  Set-ItemProperty -Path $hklm_trst -Name 0x270C -Value 3
+  Set-ItemProperty -Path $hkcu_trst -Name 0x270C -Value 3
+
+  # Trusted Sites Zone: Script ActiveX controls marked safe for scripting* = Enable
+  Set-ItemProperty -Path $hklm_trst -Name 1405 -Value 0
+  Set-ItemProperty -Path $hkcu_trst -Name 1405 -Value 0
+
 
 } -UseTransaction
 Complete-Transaction
