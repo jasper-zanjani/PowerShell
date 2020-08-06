@@ -13,3 +13,6 @@ This script makes prominent use of the `Set-ItemProperty` cmdlet
 
 #### :virgo: [Get-Sign](Get-Sign.ps1)
 A demonstration PowerShell module and cmdlet that will return the astrological sign of a person born on a given date.
+
+#### :black_nib: [Wiki](Wiki)
+Just a place to organize my notes on PowerShell scripting, cmdlet binding, parameters, and other syntax features.
